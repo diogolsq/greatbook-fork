@@ -28,3 +28,8 @@
 
 coverage
 spec/examples.txt
+
+#ignore sonarqube files
+.scannerwork/
+.sonar/
+sonar-report.html
