@@ -45,7 +45,7 @@ class Section < ApplicationRecord
     grades = user.grades(courses: requirements.keys)
 
     requirements.all? do |course, minimum_grade|
-      grades[course] && grades[course].at_least?(minimum_grade)
+      grades[course]&.at_least?(minimum_grade)
     end
   end
 
@@ -54,9 +54,9 @@ class Section < ApplicationRecord
   end
 
   def set_grade(student:, grade:)
-    e = enrollment.find_by!(user: student)
-    e.update!(grade: grade)
-    e.grade
+    enroll = enrollment.find_by!(user: student)
+    enroll.update!(grade: grade)
+    enroll.grade
   end
 
   delegate :credit_hours, to: :course
@@ -79,25 +79,11 @@ class Section < ApplicationRecord
     end
  
     def can_update?
-      role = user.role
-      if role == 'admin'
-        raise
-      elsif role == 'teacher'
-        raise
-      else
-        false
-      end
+      raise NotImplementedError
     end
 
     def can_create?(student:)
-      role = user.role
-      if role == 'admin'
-        raise
-      elsif role == 'teacher'
-        raise
-      else
-        false
-      end
+      can_update?
     end
 
     def role_for(user)
