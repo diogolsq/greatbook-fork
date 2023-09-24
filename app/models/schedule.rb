@@ -50,7 +50,6 @@ class Schedule
 
   def grades
     @grades ||= student.grades(courses: prerequisites.map(&:requirement))
-      .transform_values {|grade| Grade.to_grade(grade) }
   end
 
   def courses

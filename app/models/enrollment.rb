@@ -22,7 +22,10 @@ class Enrollment < ApplicationRecord
   belongs_to :section
   belongs_to :user
 
-  GRADES = %w(A B+ B C+ C D F)
+  # GRADES = %w(A B+ B C+ C D F)
 
-  validates :grade, inclusion: { in: GRADES, allow_nil: true }
+  # validates :grade, inclusion: { in: GRADES, allow_nil: true }
+  serialize :grade, Grade
+  validates :grade, inclusion: { in: Grade.all, allow_nil: true }
+
 end
