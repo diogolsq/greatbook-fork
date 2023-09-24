@@ -45,8 +45,7 @@ class Section < ApplicationRecord
     grades = user.grades(courses: requirements.keys)
 
     requirements.all? do |course, minimum_grade|
-      grade = grades[course]
-      grade && grade <= minimum_grade
+      grades[course] && grades[course].at_least?(minimum_grade)
     end
   end
 
@@ -61,4 +60,89 @@ class Section < ApplicationRecord
   end
 
   delegate :credit_hours, to: :course
+
+  class Role < Struct.new(:section, :user)
+    #factory method
+    def self.for(section, user)
+        role = user.role
+
+        if role == 'admin'
+          AdminRole
+        elsif role == 'teacher'
+          TeacherRole
+
+        elsif section.assistants.include?(user)
+          AssitantRole
+        else
+          StudentRole
+        end.new(section, user)
+    end
+ 
+    def can_update?
+      role = user.role
+      if role == 'admin'
+        raise
+      elsif role == 'teacher'
+        raise
+      else
+        false
+      end
+    end
+
+    def can_create?(student:)
+      role = user.role
+      if role == 'admin'
+        raise
+      elsif role == 'teacher'
+        raise
+      else
+        false
+      end
+    end
+
+    def role_for(user)
+      Role.for(self, user)
+    end
+  end
+
+  class AdminRole < Role
+    def can_update?
+      true
+    end
+
+
+    def can_create?(student:)
+      true
+    end
+  end
+
+  class TeacherRole < Role
+    def can_update?
+      section.instructor_id == user.id
+    end
+
+    def can_create?(student:)
+      section.instructor_id == user.id
+    end
+  end
+
+  class StudentRole < Role
+    def can_update?
+      false
+    end
+
+    def can_create?(student:)
+      false
+    end
+  end
+
+  class AssitantRole < Role
+    def can_update? 
+      false
+    end
+
+    def can_create?(student:)
+      user != student
+    end
+  end
 end

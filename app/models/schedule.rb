@@ -16,6 +16,8 @@ class Schedule
   def initialize(student:, sections:)
     @student  = student
     @sections = sections
+
+ 
   end
 
   def credit_hours
@@ -32,7 +34,7 @@ class Schedule
   def prerequisites_are_met
     prerequisites.each do |prereq|
       grade = grades[prereq.requirement]
-      unless grade && grade <= prereq.minimum_grade
+      unless grade&.at_least?(prereq.minimum_grade)
         errors.add(
           :prerequisites,
           :not_met,

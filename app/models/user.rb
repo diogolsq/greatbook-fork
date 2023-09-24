@@ -52,7 +52,7 @@ class User < ApplicationRecord
     history = enrollment
     history = history.where(sections: { course: courses }) if courses
     history.includes(section: :course).each_with_object({}) do |record, grades|
-      grades[record.section.course] = record.grade
+      grades[record.section.course] = Grade.to_grade(record.grade)
     end
   end
 end
